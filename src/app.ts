@@ -1,13 +1,26 @@
-const addition = (a: number, b: number): number => {
-  return a + b;
-};
-const myObj = {
-  name: 'Naveen',
-  age: 30,
-  addresses: 'snnst',
-};
-myObj.addresses = 'Gandhinagar';
-const number1: number = 5;
-const number2: number = 10;
-addition(number1, number2);
-// const result: number = addition(number1, number2);
+import express, { NextFunction, Request, Response } from 'express';
+import logger from './config/logger';
+import { HttpError } from 'http-errors';
+const app = express();
+app.get('/', async (req, res) => {
+  res.status(201).send('Welcome to auth application');
+});
+
+app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+  logger.error(err.message);
+  const statusCode = err.statusCode || 500;
+
+  res.status(statusCode).json({
+    errors: [
+      {
+        type: err.name,
+        msg: err.message,
+        path: '',
+        location: '',
+      },
+    ],
+  });
+
+  next();
+});
+export default app;

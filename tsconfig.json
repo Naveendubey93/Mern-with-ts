@@ -1,5 +1,5 @@
 {
-  "include": ["src/**/*.ts", ".eslintrc.cjs", ".prettierrc.js", "src/app.ts"],
+  "include": ["src/**/*.ts", ".eslintrc.cjs", ".prettierrc.js", "src/app.ts", "jest.config.js"],
   "exclude": ["node_modules"],
   "ignorePatterns": ["dist/"], // Exclude the entire dist directory
 
