@@ -4,6 +4,7 @@
   "description": "User management and authentication service",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon -L src/server.ts",
     "dev": "nodemon src/server.ts",
     "format:check": "prettier . --check",
     "format:fix": "prettier . --write",
