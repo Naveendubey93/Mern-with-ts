@@ -7,6 +7,7 @@ const app = express();
 app.get('/', async (req, res) => {
   res.status(201).send('Welcome to auth application');
 });
+app.use(express.json());
 
 app.use('/auth', authRouter);
 
