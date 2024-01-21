@@ -5,6 +5,7 @@ import { AppDataSource } from '../../src/config/data-source';
 // import { truncateTables } from './utils';
 import { User } from '../../src/entity/User';
 import { Roles } from '../../src/constants';
+import { isJwt } from './utils';
 describe('Post /auth/register', () => {
   let connection: DataSource;
 
@@ -123,6 +124,63 @@ describe('Post /auth/register', () => {
       const userRepository = connection.getRepository(User);
       const users = await userRepository.find();
       expect(users).toHaveLength(0);
+    });
+  });
+
+  describe('Sanitize the request', () => {
+    it('should trim the email field', async () => {
+      const userData = {
+        firstName: 'Rakesh',
+        lastName: 'k',
+        email: ' rakesh@mern.space ',
+        password: 'secret',
+        role: Roles.CUSTOMER,
+      };
+      // await request(app).post('/auth/register').send(userData);
+
+      await request(app).post('/auth/register').send(userData);
+      const userRepository = connection.getRepository(User);
+      const users = await userRepository.find();
+      expect(users[0].email).toBe('rakesh@mern.space');
+    });
+
+    it('should return the access token and refresh token', async () => {
+      const userData = {
+        firstName: 'Rakesh',
+        lastName: 'k',
+        email: ' rakesh@mern.space ',
+        password: 'secret',
+        role: Roles.CUSTOMER,
+      };
+      // await request(app).post('/auth/register').send(userData);
+
+      const response = await request(app).post('/auth/register').send(userData);
+      //Assert
+
+      // interface Headers {
+      //   ['set-cookie']: string[];
+      // }
+      interface Headers {
+        [key: string]: unknown; // Use 'unknown' instead of 'string'
+      }
+      let accessToken = null;
+      let refreshToken = null;
+      const cookies = ((response.headers as Headers)['set-cookie'] as string[]) || [];
+
+      // const cookies = (response.headers as Headers)['set-cookie'] || [];
+      cookies.forEach((cookie) => {
+        if (cookie.startsWith('accessToken=')) {
+          accessToken = cookie.split(';')[0].split('=')[1];
+        }
+
+        if (cookie.startsWith('refreshToken=')) {
+          refreshToken = cookie.split(';')[0].split('=')[1];
+        }
+      });
+      expect(accessToken).not.toBeNull();
+      expect(refreshToken).not.toBeNull();
+
+      expect(isJwt(accessToken)).toBe(true);
     });
   });
 });
