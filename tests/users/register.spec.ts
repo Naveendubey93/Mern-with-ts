@@ -2,8 +2,9 @@ import { DataSource } from 'typeorm';
 import app from '../../src/app';
 import request from 'supertest';
 import { AppDataSource } from '../../src/config/data-source';
-import { truncateTables } from './utils';
+// import { truncateTables } from './utils';
 import { User } from '../../src/entity/User';
+import { Roles } from '../../src/constants';
 describe('Post /auth/register', () => {
   let connection: DataSource;
 
@@ -12,7 +13,9 @@ describe('Post /auth/register', () => {
   });
 
   beforeEach(async () => {
-    await truncateTables(connection);
+    await connection.dropDatabase();
+    await connection.synchronize();
+    // await truncateTables(connection);
   });
 
   afterAll(async () => {
@@ -58,6 +61,51 @@ describe('Post /auth/register', () => {
       const users = await userRepository.find();
       expect(users).toHaveLength(1);
     });
+
+    it('should assign a customer role', async () => {
+      const userData = {
+        firstName: 'Rakesh',
+        lastName: 'k',
+        email: 'rakesh@mern.space',
+        password: 'secret',
+      };
+      await request(app).post('/auth/register').send(userData);
+      const userRepository = connection.getRepository(User);
+      const users = await userRepository.find();
+      expect(users[0]).toHaveProperty('role');
+      expect(users[0].role).toBe(Roles.CUSTOMER);
+    });
+  });
+
+  it('should store the hashed password', async () => {
+    const userData = {
+      firstName: 'Rakesh',
+      lastName: 'k',
+      email: 'rakesh@mern.space',
+      password: 'secret',
+    };
+    await request(app).post('/auth/register').send(userData);
+    const userRepository = connection.getRepository(User);
+    const users = await userRepository.find();
+    // console.log(users[0].password);
+    expect(users[0].password).not.toBe(userData.password);
+    expect(users[0].password).toHaveLength(60);
+    expect(users[0].password).toMatch(/^\$2b\$\d+\$/);
+  });
+
+  it('should return 400 status code if email already exists', async () => {
+    const userData = {
+      firstName: 'Rakesh',
+      lastName: 'k',
+      email: 'rakesh@mern.space',
+      password: 'secret',
+      role: Roles.CUSTOMER,
+    };
+    // await request(app).post('/auth/register').send(userData);
+    const userRepository = connection.getRepository(User);
+    await userRepository.save({ ...userData });
+    const response = await request(app).post('/auth/register').send(userData);
+    expect(response.statusCode).toBe(400);
   });
   describe('Fields are missing', () => {});
 });
