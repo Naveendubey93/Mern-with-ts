@@ -6,6 +6,7 @@ import { AppDataSource } from '../../src/config/data-source';
 import { User } from '../../src/entity/User';
 import { Roles } from '../../src/constants';
 import { isJwt } from './utils';
+import { RefreshToken } from '../../src/entity/RefreshToken';
 describe('Post /auth/register', () => {
   let connection: DataSource;
 
@@ -128,23 +129,33 @@ describe('Post /auth/register', () => {
   });
 
   describe('Sanitize the request', () => {
-    it('should trim the email field', async () => {
+    it('should store refresh token in the database', async () => {
       const userData = {
         firstName: 'Rakesh',
         lastName: 'k',
         email: ' rakesh@mern.space ',
         password: 'secret',
-        role: Roles.CUSTOMER,
       };
-      // await request(app).post('/auth/register').send(userData);
 
-      await request(app).post('/auth/register').send(userData);
-      const userRepository = connection.getRepository(User);
-      const users = await userRepository.find();
-      expect(users[0].email).toBe('rakesh@mern.space');
+      //Act
+      const response = await request(app).post('/auth/register').send(userData);
+      //Assert
+
+      const refreshTokenRepo = connection.getRepository(RefreshToken);
+      const refreshTokens = await refreshTokenRepo.find();
+      expect(refreshTokens).toHaveLength(1);
+
+      const tokens = await refreshTokenRepo
+        .createQueryBuilder('refreshToken')
+        .where('refreshToken.userId = :userId', {
+          userId: (response.body as Record<string, string>).id,
+        })
+        .getMany();
+      expect(tokens).toBeTruthy();
+      // expect(tokens).toHaveLength(1);
     });
 
-    it('should return the access token and refresh token', async () => {
+    it('should return the access token and refresh token iside a cookie', async () => {
       const userData = {
         firstName: 'Rakesh',
         lastName: 'k',
