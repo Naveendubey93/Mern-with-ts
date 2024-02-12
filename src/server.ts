@@ -9,12 +9,12 @@ const startServer = async () => {
     app.listen(Config.PORT, () => {
       logger.info(`Listening on ${Config.PORT}`);
     });
-  } catch (e) {
+  } catch (e: unknown) {
     if (e instanceof Error) {
       logger.error(e.message);
       setTimeout(() => {
         process.exit(1);
-      });
+      }, 1000);
     }
   }
 };
