@@ -7,10 +7,17 @@ export interface UserData {
   password: string;
 }
 
+export interface UserLoginData {
+  email: string;
+  password: string;
+}
+
 export interface RegisterUserRequest extends Request {
   body: UserData;
 }
-
+export interface LoginUserRequest extends Request {
+  body: UserLoginData;
+}
 export interface TokenPayload {
   sub: string;
   role: string;
