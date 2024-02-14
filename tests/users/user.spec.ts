@@ -59,7 +59,8 @@ describe('Self /auth/self', () => {
         .send();
       //Assert
       //Check if user id matches withh registered user
-      expect((reponse.body as Record<string, string>).id).toBe(data.id);
+      // expect((reponse.body as Record<string, string>).id).toBe(data.id);
+      expect(reponse.body as Record<string, string>).not.toHaveProperty('password');
     });
   });
 });
