@@ -29,5 +29,7 @@ describe('Login /auth/login', () => {
       const response = await request(app).post('/auth/login').send(userData);
       expect(response.statusCode).toBe(200);
     });
+    it('should should return accessToken and refreshToken inside the cookie', async () => {});
+    it('should should return 400 statusCode if email or password is wrong', async () => {});
   });
 });

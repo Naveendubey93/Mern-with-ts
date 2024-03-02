@@ -51,3 +51,12 @@ export interface User {
   role: string;
   // Add other properties as needed
 }
+
+export interface ITenant {
+  name: string;
+  address: string;
+}
+
+export interface CreteTenantRequest extends Request {
+  body: ITenant;
+}
