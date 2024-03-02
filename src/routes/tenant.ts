@@ -7,13 +7,30 @@ import logger from '../config/logger';
 import authenticate from '../middlewares/authenticate';
 import { canAccess } from '../middlewares/canAccess';
 import { Roles } from '../constants';
+import tenantValidator from '../validators/tenant-validator';
 const router = express.Router();
 const tenantRepository = AppDataSource.getRepository(Tenant);
 const tenantService = new TenantService(tenantRepository);
 const tenantController = new TenantController(tenantService, logger);
 
-router.post('/', authenticate, canAccess([Roles.ADMIN]), (req: Request, res: Response, next: NextFunction) =>
+router.post('/', authenticate, canAccess([Roles.ADMIN]), tenantValidator, (req: Request, res: Response, next: NextFunction) =>
   tenantController.create(req, res, next),
+);
+
+router.get('/', authenticate, canAccess([Roles.ADMIN]), (req: Request, res: Response, next: NextFunction) =>
+  tenantController.findAll(req, res, next),
+);
+
+router.get('/:tenantId', authenticate, canAccess([Roles.ADMIN]), (req: Request, res: Response, next: NextFunction) =>
+  tenantController.findOne(req, res, next),
+);
+
+router.patch('/:tenantId', authenticate, canAccess([Roles.ADMIN]), tenantValidator, (req: Request, res: Response, next: NextFunction) =>
+  tenantController.update(req, res, next),
+);
+
+router.delete('/:tenantId', authenticate, canAccess([Roles.ADMIN]), (req: Request, res: Response, next: NextFunction) =>
+  tenantController.delete(req, res, next),
 );
 
 export default router;
