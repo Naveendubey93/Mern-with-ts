@@ -1,7 +1,5 @@
-import { readFileSync } from 'fs';
 import createHttpError from 'http-errors';
 import { JwtPayload, sign } from 'jsonwebtoken';
-import path from 'path';
 import { Config } from '../config';
 import { RefreshToken } from '../entity/RefreshToken';
 import { User } from '../entity/User';
@@ -10,9 +8,13 @@ import { Repository } from 'typeorm';
 export class TokenService {
   constructor(private refreshTokenRepository: Repository<RefreshToken>) {}
   generateAccessToken(payload: JwtPayload) {
-    let privateKey: Buffer;
+    let privateKey: string; //Buffer
+    if (!Config.PRIVATE_KEY) {
+      const error = createHttpError(500, 'Sectrt ky is not set');
+      throw error;
+    }
     try {
-      privateKey = readFileSync(path.join(__dirname, '../../cert/privatekey.pem'));
+      privateKey = Config.PRIVATE_KEY; //readFileSync(path.join(__dirname, '../../cert/privatekey.pem'));
     } catch (err) {
       const error = createHttpError(500, 'Error while reading private key');
       throw error;
