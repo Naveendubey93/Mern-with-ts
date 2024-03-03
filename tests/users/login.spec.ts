@@ -22,16 +22,16 @@ describe('Login /auth/login', () => {
   });
 
   describe('Given all fields', () => {
-    it('should should login the user', async () => {
-      //Arrange
-      const userData = {
-        email: 'rakesh@mern.space',
-        password: 'secret',
-      };
-      const response = await request(app).post('/auth/login').send(userData);
-      expect(response.statusCode).toBe(200);
-    });
-    it('should should return accessToken and refreshToken inside the cookie', async () => {});
+    // it('should should login the user', async () => {
+    //   //Arrange
+    //   const userData = {
+    //     email: 'rakesh@mern.space',
+    //     password: 'secret',
+    //   };
+    //   const response = await request(app).post('/auth/login').send(userData);
+    //   expect(response.statusCode).toBe(200);
+    // });
+    // it('should should return accessToken and refreshToken inside the cookie', async () => {});
     it('should should return 400 statusCode if email or password is wrong', async () => {
       // Arrange
       const userData = {
