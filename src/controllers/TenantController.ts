@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { TenantService } from '../services/TenantService';
 import { Logger } from 'winston';
+import { validationResult } from 'express-validator';
+import createHttpError from 'http-errors';
 
 export class TenantController {
   constructor(
@@ -8,6 +10,11 @@ export class TenantController {
     private logger: Logger,
   ) {}
   async create(req: Request, res: Response, next: NextFunction) {
+    //Validation
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+      return res.status(400).json({ errors: result.array() });
+    }
     const { name, address } = req.body;
     this.logger.debug(`Create tenant: ${req.body}`);
     try {
@@ -20,9 +27,17 @@ export class TenantController {
   }
 
   async update(req: Request, res: Response, next: NextFunction) {
+    //Validation
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+      return res.status(400).json({ errors: result.array() });
+    }
     const { name, address } = req.body;
     const tenantId = Number(req.params.id);
-    this.logger.debug(`Create tenant: ${req.body}`);
+    if (isNaN(Number(tenantId))) {
+      return next(createHttpError(400, 'Invalid url parameter'));
+    }
+    this.logger.debug(`Request for updating a tenant: ${req.body}`);
     try {
       await this.tenantService.update(tenantId, { name, address });
       this.logger.info('Tenant has been updated', { tenantId });
@@ -42,9 +57,14 @@ export class TenantController {
   }
 
   async findOne(req: Request, res: Response, next: NextFunction) {
+    const tenantId = Number(req.params.tenantId);
+    if (isNaN(tenantId)) {
+      return next(createHttpError(400, 'Invalid url param.'));
+    }
     try {
-      const tenantId = Number(req.params.tenantId);
       const tenants = await this.tenantService.getById(tenantId);
+      this.logger.info('Tenant has been fetched');
+
       res.status(200).json({ data: tenants });
     } catch (err) {
       return next(err);
@@ -52,8 +72,12 @@ export class TenantController {
   }
 
   async delete(req: Request, res: Response, next: NextFunction) {
+    const tenantId = Number(req.params.id);
+    if (isNaN(tenantId)) {
+      return next(createHttpError(400, 'Invalid url param.'));
+    }
+
     try {
-      const tenantId = Number(req.params.tenantId);
       await this.tenantService.deleteById(tenantId);
       res.status(200).json({});
     } catch (err) {

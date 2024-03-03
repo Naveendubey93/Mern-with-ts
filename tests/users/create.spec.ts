@@ -40,8 +40,9 @@ describe('Post /users', () => {
       const userData = {
         firstName: 'Rakesh',
         lastName: 'k',
-        email: ' rakesh@mern.space ',
-        password: 'secret',
+        email: 'rakesh@mern.space',
+        password: 'secret12345',
+        role: 'admin',
         tenantId: 1,
       };
 
@@ -52,7 +53,6 @@ describe('Post /users', () => {
         .post('/users')
         .set('Cookie', [`accessToken=${adminToken}`])
         .send(userData);
-
       const userRepository = connection.getRepository(User);
       const users = await userRepository.find();
 
@@ -61,7 +61,7 @@ describe('Post /users', () => {
     });
     it('should create a manager user', async () => {
       const adminToken = jwks.token({
-        sub: '1',
+        sub: '2',
         role: Roles.ADMIN,
       });
 
@@ -69,9 +69,10 @@ describe('Post /users', () => {
       const userData = {
         firstName: 'Rakesh',
         lastName: 'K',
-        email: 'rakesh@mern.space',
-        password: 'secret',
-        tenantId: 1,
+        role: 'manager',
+        email: 'rakesh1@mern.space',
+        password: 'secret1234',
+        tenantId: 2,
       };
 
       // Add token to cookie

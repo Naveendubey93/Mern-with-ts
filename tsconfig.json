@@ -1,6 +1,6 @@
 {
   "include": ["src/**/*.ts", ".eslintrc.cjs", ".prettierrc.js", "src/app.ts", "jest.config.js", "tests/**/*.ts"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "**/*.spec.ts","tests"],
   "ignorePatterns": ["dist/"], // Exclude the entire dist directory
 
   "compilerOptions": {
