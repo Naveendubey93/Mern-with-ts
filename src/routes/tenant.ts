@@ -17,19 +17,17 @@ router.post('/', authenticate, canAccess([Roles.ADMIN]), tenantValidator, (req: 
   tenantController.create(req, res, next),
 );
 
-router.get('/', authenticate, canAccess([Roles.ADMIN]), (req: Request, res: Response, next: NextFunction) =>
-  tenantController.findAll(req, res, next),
-);
+router.get('/', (req: Request, res: Response, next: NextFunction) => tenantController.findAll(req, res, next));
 
-router.get('/:tenantId', authenticate, canAccess([Roles.ADMIN]), (req: Request, res: Response, next: NextFunction) =>
+router.get('/:id', authenticate, canAccess([Roles.ADMIN]), (req: Request, res: Response, next: NextFunction) =>
   tenantController.findOne(req, res, next),
 );
 
-router.patch('/:tenantId', authenticate, canAccess([Roles.ADMIN]), tenantValidator, (req: Request, res: Response, next: NextFunction) =>
+router.patch('/:id', authenticate, canAccess([Roles.ADMIN]), tenantValidator, (req: Request, res: Response, next: NextFunction) =>
   tenantController.update(req, res, next),
 );
 
-router.delete('/:tenantId', authenticate, canAccess([Roles.ADMIN]), (req: Request, res: Response, next: NextFunction) =>
+router.delete('/:id', authenticate, canAccess([Roles.ADMIN]), (req: Request, res: Response, next: NextFunction) =>
   tenantController.delete(req, res, next),
 );
 
