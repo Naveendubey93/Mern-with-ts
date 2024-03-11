@@ -8,13 +8,15 @@ import { Repository } from 'typeorm';
 export class TokenService {
   constructor(private refreshTokenRepository: Repository<RefreshToken>) {}
   generateAccessToken(payload: JwtPayload) {
-    let privateKey: string; //Buffer
+    let privateKey: Buffer;
     if (!Config.PRIVATE_KEY) {
       const error = createHttpError(500, 'Sectrt ky is not set');
       throw error;
     }
+
     try {
-      privateKey = Config.PRIVATE_KEY; //readFileSync(path.join(__dirname, '../../cert/privatekey.pem'));
+      const privateKeyBase64 = Config.PRIVATE_KEY; //readFileSync(path.join(__dirname, '../../cert/privatekey.pem'));
+      privateKey = Buffer.from(privateKeyBase64, 'base64');
     } catch (err) {
       const error = createHttpError(500, 'Error while reading private key');
       throw error;
