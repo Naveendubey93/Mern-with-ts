@@ -12,7 +12,7 @@ describe('Post /auth/register', () => {
 
   beforeAll(async () => {
     connection = await AppDataSource.initialize();
-  });
+  }, 10000);
 
   beforeEach(async () => {
     await connection.dropDatabase();

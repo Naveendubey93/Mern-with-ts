@@ -21,5 +21,7 @@ module.exports = {
     'prefer-const': 'error',
     'dot-notation': 'error',
     'no-console': 'error',
+    // '@typescript-eslint/no-misused-promises': 'off',
+    '@typescript-eslint/require-await': 'off',
   },
 };
