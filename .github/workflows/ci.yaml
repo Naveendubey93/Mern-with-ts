@@ -49,7 +49,7 @@ jobs:
       IMAGE_NAME: nkdubey12/mernstack_auth_service
       IMAGE_TAG: build-${{ github.run_number }}
       
-   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
       - name: Checkout repository
