@@ -1,7 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { UserController } from '../controllers/UserController';
-// import { Tenant } from '../entity/Tenants';
-// import { TenantService } from '../services/TenantService';
 import { AppDataSource } from '../config/data-source';
 import logger from '../config/logger';
 import authenticate from '../middlewares/authenticate';
