@@ -28,7 +28,7 @@ jobs:
           DB_HOST: ${{ secrets.TEST_DB_HOST }}
           DB_PORT: ${{ secrets.TEST_DB_PORT }}
           DB_USERNAME: ${{ secrets.TEST_DB_USERNAME }}
-          DB_PASSWD: ${{ secrets.TEST_DB_PASSWD }}
+          DB_PASSWORD: ${{ secrets.TEST_DB_PASSWD }}
           DB_NAME: ${{ secrets.TEST_DB_NAME }}
           REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
           JWKS_URI: ${{ secrets.JWKS_URI }}
