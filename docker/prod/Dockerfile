@@ -18,6 +18,9 @@ WORKDIR /app
 
 COPY package*.json ./
 
+# Install app dependencies
+RUN npm install
+
 RUN npm ci --ignore-scripts
 
 COPY --from=builder /app/dist ./
