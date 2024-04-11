@@ -14,7 +14,7 @@ describe('Post /users', () => {
   beforeAll(async () => {
     jwks = createJWKSMock('http://localhost:5501');
     connection = await AppDataSource.initialize();
-  }, 10000);
+  });
 
   beforeEach(async () => {
     jwks.start();
