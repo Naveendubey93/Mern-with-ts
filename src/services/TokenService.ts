@@ -10,7 +10,7 @@ export class TokenService {
   generateAccessToken(payload: JwtPayload) {
     let privateKey: string; //Buffer
     if (!Config.PRIVATE_KEY) {
-      const error = createHttpError(500, 'Sectrt ky is not set');
+      const error = createHttpError(500, 'Secret ky is not set');
       throw error;
     }
 
