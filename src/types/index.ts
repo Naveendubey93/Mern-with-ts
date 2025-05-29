@@ -6,6 +6,7 @@ export interface UserData {
   email: string;
   password: string;
   role: string;
+  tenantId: number;
 }
 
 export interface UserLoginData {
@@ -74,4 +75,11 @@ export interface LimitedUserData {
 
 export interface UpdateUserRequest extends Request {
   body: LimitedUserData;
+}
+
+export interface UserQueryParams {
+  perPage: number;
+  currentPage: number;
+  q?: string;
+  role?: string;
 }

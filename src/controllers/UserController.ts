@@ -2,14 +2,14 @@ import { NextFunction, Request, Response } from 'express';
 import { UserService } from '../services/UserService';
 import { Logger } from 'winston';
 import { Roles } from '../constants';
-import { validationResult } from 'express-validator';
+import { matchedData, validationResult } from 'express-validator';
 import createHttpError from 'http-errors';
-import { UpdateUserRequest } from '../types';
+import { UpdateUserRequest, UserQueryParams } from '../types';
 
 export class UserController {
   constructor(
-    private userService: UserService,
-    private logger: Logger,
+    private readonly userService: UserService,
+    private readonly logger: Logger,
   ) {}
   async create(req: Request, res: Response, next: NextFunction) {
     // Validation
@@ -64,11 +64,23 @@ export class UserController {
   }
 
   async getAll(req: Request, res: Response, next: NextFunction) {
+    const validatedQuery = matchedData(req, {
+      onlyValidData: true,
+    });
+    const { currentPage, perPage } = validatedQuery;
+
+    this.logger.debug('Request for getting all users', currentPage, validatedQuery);
     try {
-      const users = await this.userService.getAll();
+      const [users, count] = await this.userService.getAll(validatedQuery as UserQueryParams);
 
       this.logger.info('All users have been fetched');
-      res.json(users);
+      res.json({
+        users,
+        count,
+        currentPage: Number(currentPage),
+        perPage: Number(perPage),
+        totalPages: Math.ceil(count / Number(perPage)),
+      });
     } catch (err) {
       next(err);
     }
