@@ -11,10 +11,10 @@ import { CredentialService } from '../services/CredentialService';
 import { Roles } from '../constants';
 export class AuthController {
   constructor(
-    private userService: UserService,
-    private logger: Logger,
-    private tokenService: TokenService,
-    private credentialService: CredentialService,
+    private readonly userService: UserService,
+    private readonly logger: Logger,
+    private readonly tokenService: TokenService,
+    private readonly credentialService: CredentialService,
   ) {
     // this.userService = userService;
   }
@@ -22,10 +22,12 @@ export class AuthController {
     //validation
     const result = validationResult(req);
     if (!result.isEmpty()) {
-      return res.status(400).json({ error: result.array() });
+      return next(createHttpError(400, result.array()[0].msg || 'Validation failed'));
+
+      // return res.status(400).json({ error: result.array() });
     }
 
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, tenantId } = req.body;
     try {
       const user = await this.userService.create({
         firstName,
@@ -33,6 +35,7 @@ export class AuthController {
         email,
         password,
         role: Roles.CUSTOMER,
+        tenantId,
       });
       this.logger.info('User has been registered', { id: user.id });
       const payload: JwtPayload = {

@@ -1,13 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import { TenantService } from '../services/TenantService';
 import { Logger } from 'winston';
-import { validationResult } from 'express-validator';
+import { matchedData, validationResult } from 'express-validator';
 import createHttpError from 'http-errors';
+import { TenantQueryParams } from '../types';
 
 export class TenantController {
   constructor(
-    private tenantService: TenantService,
-    private logger: Logger,
+    private readonly tenantService: TenantService,
+    private readonly logger: Logger,
   ) {}
   async create(req: Request, res: Response, next: NextFunction) {
     //Validation
@@ -49,8 +50,14 @@ export class TenantController {
 
   async findAll(req: Request, res: Response, next: NextFunction) {
     try {
-      const tenants = await this.tenantService.getAll();
-      res.status(200).json({ data: tenants });
+      const validatedQuery = matchedData(req, {
+        onlyValidData: true,
+      });
+      const { perPage, currentPage } = validatedQuery;
+      const [tenants, count] = await this.tenantService.getAll(validatedQuery as TenantQueryParams);
+      res
+        .status(200)
+        .json({ data: tenants, count, currentPage: Number(currentPage), perPage: Number(perPage), totalPages: Math.ceil(count / perPage) });
     } catch (err) {
       return next(err);
     }

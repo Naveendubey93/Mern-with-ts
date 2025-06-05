@@ -15,12 +15,12 @@ export class UserController {
     // Validation
     const result = validationResult(req);
     if (!result.isEmpty()) {
-      return res.status(400).json({ errors: result.array() });
+      return next(createHttpError(400, result.array()[0].msg));
     }
-    const { firstName, lastName, email, password, role } = req.body;
+    const { firstName, lastName, email, password, role, tenantId } = req.body;
     this.logger.debug(`Create tenant: ${req.body}`);
     try {
-      const user = await this.userService.create({ firstName, lastName, email, password, role: role || Roles.MANAGER });
+      const user = await this.userService.create({ firstName, lastName, email, password, role: role ?? Roles.MANAGER, tenantId });
       this.logger.info('User has been created', { id: user.id });
       res.status(201).json({ id: user.id });
     } catch (err) {
@@ -35,10 +35,11 @@ export class UserController {
     // Validation
     const result = validationResult(req);
     if (!result.isEmpty()) {
-      return res.status(400).json({ errors: result.array() });
+      return next(createHttpError(400, result.array()[0].msg));
+      // return res.status(400).json({ errors: result.array() });
     }
 
-    const { firstName, lastName, role } = req.body;
+    const { firstName, lastName, role, email, tenantId } = req.body;
     const userId = req.params.id;
 
     if (isNaN(Number(userId))) {
@@ -53,6 +54,8 @@ export class UserController {
         firstName,
         lastName,
         role,
+        email,
+        tenantId: tenantId ? Number(tenantId) : undefined,
       });
 
       this.logger.info('User has been updated', { id: userId });

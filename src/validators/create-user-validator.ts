@@ -1,6 +1,6 @@
 import { checkSchema } from 'express-validator';
 
-export default checkSchema({
+const createUserValidator = checkSchema({
   email: {
     trim: true,
     errorMessage: 'Email is required!',
@@ -21,12 +21,10 @@ export default checkSchema({
   },
   password: {
     trim: true,
-    errorMessage: 'Last name is required!',
+    errorMessage: 'Password is required!',
     notEmpty: true,
     isLength: {
-      options: {
-        min: 8,
-      },
+      options: { min: 8 },
       errorMessage: 'Password length should be at least 8 chars!',
     },
   },
@@ -36,3 +34,5 @@ export default checkSchema({
     trim: true,
   },
 });
+
+export default createUserValidator;
