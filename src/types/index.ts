@@ -72,7 +72,7 @@ export interface LimitedUserData {
   lastName: string;
   role: string;
   email: string;
-  tenantId?: number;
+  tenantId?: number | null;
 }
 
 export interface UpdateUserRequest extends Request {

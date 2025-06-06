@@ -55,7 +55,7 @@ export class UserController {
         lastName,
         role,
         email,
-        tenantId: tenantId ? Number(tenantId) : undefined,
+        tenantId: tenantId ? Number(tenantId) : null,
       });
 
       this.logger.info('User has been updated', { id: userId });

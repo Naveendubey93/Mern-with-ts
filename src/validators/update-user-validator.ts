@@ -25,10 +25,17 @@ export default checkSchema({
     trim: true,
   },
   tenantId: {
-    isInt: {
-      errorMessage: 'Tenant ID must be an integer!',
-    },
     notEmpty: true,
     errorMessage: 'Tenant ID is required!',
+    trim: true,
+    custom: {
+      options: (value: string, { req }) => {
+        if (req.body && req.body.role === 'admin') {
+          return true; // Admins can have any tenant ID
+        } else {
+          return !!value;
+        }
+      },
+    },
   },
 });
