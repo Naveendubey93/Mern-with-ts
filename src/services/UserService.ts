@@ -19,7 +19,7 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    return await this.userRepository.findOne({ where: { email } });
+    return await this.userRepository.findOne({ where: { email }, relations: { tenant: true } });
   }
 
   async findById(id: number) {
@@ -31,6 +31,9 @@ export class UserService {
         email,
       },
       select: ['id', 'firstName', 'lastName', 'email', 'role', 'password'],
+      relations: {
+        tenant: true,
+      },
     });
   }
 
