@@ -2,25 +2,25 @@ import { NextFunction, Request, Response } from 'express';
 import { UserService } from '../services/UserService';
 import { Logger } from 'winston';
 import { Roles } from '../constants';
-import { validationResult } from 'express-validator';
+import { matchedData, validationResult } from 'express-validator';
 import createHttpError from 'http-errors';
-import { UpdateUserRequest } from '../types';
+import { UpdateUserRequest, UserQueryParams } from '../types';
 
 export class UserController {
   constructor(
-    private userService: UserService,
-    private logger: Logger,
+    private readonly userService: UserService,
+    private readonly logger: Logger,
   ) {}
   async create(req: Request, res: Response, next: NextFunction) {
     // Validation
     const result = validationResult(req);
     if (!result.isEmpty()) {
-      return res.status(400).json({ errors: result.array() });
+      return next(createHttpError(400, result.array()[0].msg));
     }
-    const { firstName, lastName, email, password, role } = req.body;
+    const { firstName, lastName, email, password, role, tenantId } = req.body;
     this.logger.debug(`Create tenant: ${req.body}`);
     try {
-      const user = await this.userService.create({ firstName, lastName, email, password, role: role || Roles.MANAGER });
+      const user = await this.userService.create({ firstName, lastName, email, password, role: role ?? Roles.MANAGER, tenantId });
       this.logger.info('User has been created', { id: user.id });
       res.status(201).json({ id: user.id });
     } catch (err) {
@@ -35,10 +35,11 @@ export class UserController {
     // Validation
     const result = validationResult(req);
     if (!result.isEmpty()) {
-      return res.status(400).json({ errors: result.array() });
+      return next(createHttpError(400, result.array()[0].msg));
+      // return res.status(400).json({ errors: result.array() });
     }
 
-    const { firstName, lastName, role } = req.body;
+    const { firstName, lastName, role, email, tenantId } = req.body;
     const userId = req.params.id;
 
     if (isNaN(Number(userId))) {
@@ -53,6 +54,8 @@ export class UserController {
         firstName,
         lastName,
         role,
+        email,
+        tenantId: tenantId ? Number(tenantId) : null,
       });
 
       this.logger.info('User has been updated', { id: userId });
@@ -64,11 +67,23 @@ export class UserController {
   }
 
   async getAll(req: Request, res: Response, next: NextFunction) {
+    const validatedQuery = matchedData(req, {
+      onlyValidData: true,
+    });
+    const { currentPage, perPage } = validatedQuery;
+
+    this.logger.debug('Request for getting all users', currentPage, validatedQuery);
     try {
-      const users = await this.userService.getAll();
+      const [users, count] = await this.userService.getAll(validatedQuery as UserQueryParams);
 
       this.logger.info('All users have been fetched');
-      res.json(users);
+      res.json({
+        users,
+        count,
+        currentPage: Number(currentPage),
+        perPage: Number(perPage),
+        totalPages: Math.ceil(count / Number(perPage)),
+      });
     } catch (err) {
       next(err);
     }

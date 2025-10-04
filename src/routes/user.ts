@@ -10,6 +10,7 @@ import { UserService } from '../services/UserService';
 import createUserValidator from '../validators/create-user-validator';
 import updateUserValidator from '../validators/update-user-validator';
 import { UpdateUserRequest } from '../types';
+import listUsersValidator from '../validators/list-users-validator';
 const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);
 const userService = new UserService(userRepository);
@@ -19,7 +20,9 @@ router.post('/', authenticate, canAccess([Roles.ADMIN]), createUserValidator, (r
   userController.create(req, res, next),
 );
 
-router.get('/', authenticate, canAccess([Roles.ADMIN]), (req: Request, res: Response, next: NextFunction) => userController.getAll(req, res, next));
+router.get('/', authenticate, canAccess([Roles.ADMIN]), listUsersValidator, (req: Request, res: Response, next: NextFunction) =>
+  userController.getAll(req, res, next),
+);
 
 router.get('/:id', authenticate, canAccess([Roles.ADMIN]), (req: Request, res: Response, next: NextFunction) =>
   userController.getOne(req, res, next),
